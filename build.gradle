@@ -1,10 +1,45 @@
-group 'io.vulpine.lib'
-apply plugin: 'java'
+plugins {
+  id "com.jfrog.bintray" version "1.7.1"
+}
 
-version = '0.1.0'
+class Conf {
+  static group   = 'io.vulpine.lib'
+  static version = '0.1.1'
+  static name    = 'simple-sql'
+  static repo    = 'lib-simple-sql'
+  static jvm     = '1.6'
+}
+
+group Conf.group
+version Conf.version
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+/*
+ * BinTray Configuration
+ */
+bintray {
+  user = System.getenv('BINTRAY_USER')
+  key = System.getenv('BINTRAY_KEY')
+  publications = ['maven']
+  pkg {
+    repo = 'maven'
+    name = Conf.name
+    userOrg = 'vpx'
+    licenses = ['Apache-2.0']
+    vcsUrl = "https://bitbucket.org/Vulpine/${Conf.name}"
+    version {
+      name = Conf.version
+      released = new Date()
+      vcsTag = Conf.version
+    }
+  }
+}
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.9'
+  gradleVersion = '2.14.1'
   distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
  
@@ -13,3 +48,59 @@ repositories {
 
 dependencies {
 }
+
+publishing {
+  repositories {
+    maven {
+      url "https://api.bintray.com/maven/vpx/maven/${Conf.name}/;publish=1"
+    }
+  }
+  publications {
+    maven(MavenPublication) {
+      from components.java
+      pom.withXml {
+        asNode().appendNode('project', {
+          asNode().appendNode('inceptionYear', '2016')
+          asNode().appendNode('organization', {
+            asNode().appendNode('name', 'Vulpine IO')
+            asNode().appendNode('url', 'http://vulpine.io')
+          })
+
+          asNode().appendNode('developers', {
+            asNode().appendNode('developer', {
+              asNode().appendNode('id', 'elliefops')
+              asNode().appendNode('name', 'Elizabeth Harper')
+              asNode().appendNode('email', 'elliefops@gmail.com')
+            })
+          })
+
+          asNode().appendNode('issueManagement', {
+            asNode().appendNode('system', 'YouTrack')
+              asNode().appendNode('url', "http://vulpine.myjetbrains.com/youtrack/issues?q=project%3A+${Conf.repo}")
+          })
+
+          asNode().appendNode('ciManagement', {
+            asNode().appendNode('system', 'Jenkins')
+            asNode().appendNode('url', "http://ec2-54-87-131-122.compute-1.amazonaws.com/job/${Conf.repo}/")
+          })
+
+          asNode().appendNode('scm', {
+            asNode().appendNode('connection', "scm:git:https://bitbucket.org/Vulpine/${Conf.name}.git")
+            asNode().appendNode('developerConnection', "scm:git:https://bitbucket.org/Vulpine/${Conf.name}.git")
+            asNode().appendNode('tag', 'master')
+            asNode().appendNode('url', "https://bitbucket.org/Vulpine/${Conf.name}")
+          })
+
+          asNode().appendNode('licenses', {
+            asNode().appendNode('license', {
+              asNode().appendNode('name', 'Apache License, Version 2.0')
+              asNode().appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.txt')
+              asNode().appendNode('distribution', 'repo')
+            })
+          })
+        })
+      }
+    }
+  }
+}
+
