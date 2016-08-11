@@ -40,7 +40,7 @@ public class SqlImport
   private static String grantPath    = "grant/";
   private static String revokePath   = "revoke/";
 
-  private static Map < String, String > sqlMap = new HashMap <>();
+  private static Map < String, String > sqlMap = new HashMap < String, String >();
 
   public static String rawSql ( final String path )
   {
