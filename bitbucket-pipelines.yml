@@ -7,7 +7,8 @@ pipelines:
         - gradle build
   branches:
     master:
-      step:
+      - step:
         script:
           - gradle build bintrayUpload
+      - step:
           
