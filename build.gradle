@@ -2,23 +2,24 @@ plugins {
   id "com.jfrog.bintray" version "1.7.1"
 }
 
-class Conf {
-  static group   = 'io.vulpine.lib'
-  static version = '0.1.3'
-  static name    = 'simple-sql'
-  static repo    = 'lib-simple-sql'
-  static jvm     = '1.6'
-}
+def config = [
+  group:   'io.vulpine.lib',
+  groupKey: 'vulpine',
+  version: '0.1.3',
+  name:    'simple-sql',
+  repo:    'lib-simple-sql',
+  jvm:     '1.6'
+];
 
-group Conf.group
-version Conf.version
+group config.group
+version config.version
 
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
-sourceCompatibility = Conf.jvm
-targetCompatibility = Conf.jvm
+sourceCompatibility = config.jvm
+targetCompatibility = config.jvm
 
 /*
  * BinTray Configuration
@@ -29,14 +30,14 @@ bintray {
   publications = ['maven']
   pkg {
     repo = 'maven'
-    name = Conf.name
+    name = config.name
     userOrg = 'vpx'
     licenses = ['Apache-2.0']
-    vcsUrl = "https://bitbucket.org/Vulpine/${Conf.name}"
+    vcsUrl = "https://bitbucket.org/${config.groupKey}/${config.name}"
     version {
-      name = Conf.version
+      name = config.version
       released = new Date()
-      vcsTag = Conf.version
+      vcsTag = config.version
     }
   }
 }
@@ -45,82 +46,52 @@ task wrapper(type: Wrapper) {
   gradleVersion = '2.14.1'
   distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
- 
-repositories {
-}
 
-dependencies {
-}
+repositories {}
+dependencies {}
 
-def mApp = { Node node, Map vals ->
-  vals.forEach({ k, v -> node.appendNode(k, v) })
-  return node
-}
-def nApp = { node, child ->
-  node.append(child)
-  return node
-}
+class Wrap{Node u;Wrap p;Wrap(n){u=n};Wrap(a,b){u=a;p=b};Wrap mApp(s,Map v){def c=u.appendNode(s);v.forEach({k,d->c.
+appendNode(k,d)});return new Wrap(c,this)};Wrap nApp(s,...l){def n=u.appendNode(s);for(def c:l)n.append(c);return new
+Wrap(n,this)};Wrap app(a, b){def n=u.appendNode(a,b);return new Wrap(n,this)};Wrap up(){return p}}
 
 publishing {
-  repositories {
-    maven {
-      url "https://api.bintray.com/maven/vpx/maven/${Conf.name}/;publish=1"
-    }
-  }
+
+  repositories { maven { url "https://api.bintray.com/maven/vpx/maven/${config.name}/;publish=1" } }
+
   publications {
     maven(MavenPublication) {
       from components.java
       pom.withXml {
-        { project ->
+        { Node project ->
 
-          project.appendNode('inceptionYear', '2016')
-          mApp(
-            project.appendNode('organization'),
-            [name: 'Vulpine IO', url: 'http://vulpine.io']
-          );
+          def bitBucketUrl = "https://bitbucket.org/${config.groupKey}/${config.name}";
 
-          nApp(
-            project.appendNode('developers'),
-            mApp(new Node(null, 'developer'), [id: 'elliefops', name: 'Elizabeth Harper', email: 'elliefops@gmail.com'])
-          );
-
-          mApp(
-            project.appendNode('issueManagement'),
-            [system: 'YouTrack', url: "http://vulpine.myjetbrains.com/youtrack/issues?q=project%3A+${Conf.repo}"]
-          );
-
-          mApp(
-            project.appendNode('ciManagement'),
-            [system: 'Jenkins', url: "http://ec2-54-87-131-122.compute-1.amazonaws.com/job/${Conf.repo}/"]
-          );
-
-          mApp(
-            project.appendNode('scm'),
-            [
-              connection: "scm:git:https://bitbucket.org/Vulpine/${Conf.name}.git",
-              developerConnection: "scm:git:https://bitbucket.org/Vulpine/${Conf.name}.git",
-              tag: 'master',
-              url: "https://bitbucket.org/Vulpine/${Conf.name}"
-            ]
-          );
-
-          nApp(
-            project.appendNode('licenses'),
-            mApp(
-              new Node(null, 'license'),
-              [
-                name: 'Apache License, Version 2.0',
-                url: 'http://www.apache.org/licenses/LICENSE-2.0.txt',
+          new Wrap(project)
+            .app('inceptionYear', '2016').up()
+            .mApp('organization', [name: 'Vulpine IO', url: 'http://vulpine.io']).up()
+            .nApp('developers')
+              .mApp('developer', [id: 'elliefops', name: 'Elizabeth Harper', email: 'elliefops@gmail.com']).up().up()
+            .mApp('issueManagement', [
+              system: 'YouTrack',
+              url:    "http://${config.groupKey}.myjetbrains.com/youtrack/issues?q=project%3A+${config.repo}"
+            ]).up()
+            .mApp('ciManagement', [ system: 'Bitbucket Pipelines', url: "${bitBucketUrl}/addon/pipelines/home#!/" ]).up()
+            .mApp('scm', [
+              connection:          "scm:git:${bitBucketUrl}.git",
+              developerConnection: "scm:git:${bitBucketUrl}.git",
+              tag:                 'master',
+              url:                 bitBucketUrl
+            ]).up()
+            .nApp('licenses')
+               .mApp('license', [
+                name        : 'Apache License, Version 2.0',
+                url         : 'http://www.apache.org/licenses/LICENSE-2.0.txt',
                 distribution: 'repo'
-              ]
-            )
-          );
+              ]);
+
           return project;
-        }.call(asNode())
-
-
+        }.call((Node)asNode())
       }
     }
   }
 }
-
