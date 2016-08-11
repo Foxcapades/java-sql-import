@@ -37,4 +37,14 @@ public class ImportPreparedStatement
   {
     return c.prepareStatement(SqlImport.insert(p));
   }
+
+  public static PreparedStatement update( final Connection c, final String p ) throws SQLException
+  {
+    return c.prepareStatement(SqlImport.udpate(p));
+  }
+
+  public static PreparedStatement delete( final Connection c, final String p ) throws SQLException
+  {
+    return c.prepareStatement(SqlImport.delete(p));
+  }
 }
