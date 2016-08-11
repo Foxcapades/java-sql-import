@@ -4,7 +4,7 @@ plugins {
 
 class Conf {
   static group   = 'io.vulpine.lib'
-  static version = '0.1.1'
+  static version = '0.1.2'
   static name    = 'simple-sql'
   static repo    = 'lib-simple-sql'
   static jvm     = '1.6'
@@ -16,6 +16,9 @@ version Conf.version
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
+
+sourceCompatibility Conf.jvm
+targetCompatibility Conf.jvm
 
 /*
  * BinTray Configuration

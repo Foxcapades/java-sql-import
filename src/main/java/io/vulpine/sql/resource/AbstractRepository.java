@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2016 Elizabeth Harper
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,9 +30,9 @@ public abstract class AbstractRepository
     this.dataSource = dataSource;
   }
 
-  protected static void close( final AutoCloseable... q ) throws Exception
+  protected static void close( final Object... q ) throws Exception
   {
-    for ( final AutoCloseable a : q ) {
+    for ( final Object a : q ) {
 
       if (a instanceof ResultSet) {
 
@@ -75,10 +75,6 @@ public abstract class AbstractRepository
 
         if (!c.isClosed())
           c.close();
-
-      } else {
-
-        a.close();
 
       }
     }

@@ -1,0 +1,13 @@
+image: frekele/gradle
+
+pipelines:
+  default:
+    - step:
+      script:
+        - gradle build
+  branches:
+    master:
+      - step:
+        script:
+          - gradle build
+          - gradle bintrayUpload
