@@ -49,6 +49,15 @@ repositories {
 dependencies {
 }
 
+def mApp = { Node node, Map vals ->
+  vals.forEach({ k, v -> node.appendNode(k, v) })
+  return node
+}
+def nApp = { node, child ->
+  node.append(child)
+  return node
+}
+
 publishing {
   repositories {
     maven {
@@ -59,46 +68,54 @@ publishing {
     maven(MavenPublication) {
       from components.java
       pom.withXml {
-        asNode().appendNode('project', {
-          asNode().appendNode('inceptionYear', '2016')
-          asNode().appendNode('organization', {
-            asNode().appendNode('name', 'Vulpine IO')
-            asNode().appendNode('url', 'http://vulpine.io')
-          })
+        { project ->
 
-          asNode().appendNode('developers', {
-            asNode().appendNode('developer', {
-              asNode().appendNode('id', 'elliefops')
-              asNode().appendNode('name', 'Elizabeth Harper')
-              asNode().appendNode('email', 'elliefops@gmail.com')
-            })
-          })
+          project.appendNode('inceptionYear', '2016')
+          mApp(
+            project.appendNode('organization'),
+            [name: 'Vulpine IO', url: 'http://vulpine.io']
+          );
 
-          asNode().appendNode('issueManagement', {
-            asNode().appendNode('system', 'YouTrack')
-              asNode().appendNode('url', "http://vulpine.myjetbrains.com/youtrack/issues?q=project%3A+${Conf.repo}")
-          })
+          nApp(
+            project.appendNode('developers'),
+            mApp(new Node(null, 'developer'), [id: 'elliefops', name: 'Elizabeth Harper', email: 'elliefops@gmail.com'])
+          );
 
-          asNode().appendNode('ciManagement', {
-            asNode().appendNode('system', 'Jenkins')
-            asNode().appendNode('url', "http://ec2-54-87-131-122.compute-1.amazonaws.com/job/${Conf.repo}/")
-          })
+          mApp(
+            project.appendNode('issueManagement'),
+            [system: 'YouTrack', url: "http://vulpine.myjetbrains.com/youtrack/issues?q=project%3A+${Conf.repo}"]
+          );
 
-          asNode().appendNode('scm', {
-            asNode().appendNode('connection', "scm:git:https://bitbucket.org/Vulpine/${Conf.name}.git")
-            asNode().appendNode('developerConnection', "scm:git:https://bitbucket.org/Vulpine/${Conf.name}.git")
-            asNode().appendNode('tag', 'master')
-            asNode().appendNode('url', "https://bitbucket.org/Vulpine/${Conf.name}")
-          })
+          mApp(
+            project.appendNode('ciManagement'),
+            [system: 'Jenkins', url: "http://ec2-54-87-131-122.compute-1.amazonaws.com/job/${Conf.repo}/"]
+          );
 
-          asNode().appendNode('licenses', {
-            asNode().appendNode('license', {
-              asNode().appendNode('name', 'Apache License, Version 2.0')
-              asNode().appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.txt')
-              asNode().appendNode('distribution', 'repo')
-            })
-          })
-        })
+          mApp(
+            project.appendNode('scm'),
+            [
+              connection: "scm:git:https://bitbucket.org/Vulpine/${Conf.name}.git",
+              developerConnection: "scm:git:https://bitbucket.org/Vulpine/${Conf.name}.git",
+              tag: 'master',
+              url: "https://bitbucket.org/Vulpine/${Conf.name}"
+            ]
+          );
+
+          nApp(
+            project.appendNode('licenses'),
+            mApp(
+              new Node(null, 'license'),
+              [
+                name: 'Apache License, Version 2.0',
+                url: 'http://www.apache.org/licenses/LICENSE-2.0.txt',
+                distribution: 'repo'
+              ]
+            )
+          );
+          return project;
+        }.call(asNode().appendNode('project'))
+
+
       }
     }
   }
