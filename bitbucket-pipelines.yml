@@ -1,10 +1,12 @@
 image: frekele/gradle:2.14.1-jdk8u102
 
 pipelines:
+
   default:
     - step:
       script:
         - gradle build
+        
   branches:
     master:
       - step:
