@@ -9,4 +9,4 @@ pipelines:
     development:
       - step:
           script:
-            - gradle build bintrayUpload
+            - gradle build
