@@ -17,8 +17,8 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
-sourceCompatibility Conf.jvm
-targetCompatibility Conf.jvm
+sourceCompatibility = Conf.jvm
+targetCompatibility = Conf.jvm
 
 /*
  * BinTray Configuration
