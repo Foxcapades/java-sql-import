@@ -1,0 +1,12 @@
+language: java
+
+jdk:
+- openjdk6
+- oraclejdk7
+- oraclejdk8
+
+before_install: chmod +x gradlew
+
+script: ./gradlew build
+
+after_success: ./gradlew bintrayUpload
