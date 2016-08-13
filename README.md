@@ -1,4 +1,4 @@
 # simple-sql
 
 [ ![Download](https://api.bintray.com/packages/vpx/maven/simple-sql/images/download.svg) ](https://bintray.com/vpx/maven/simple-sql/_latestVersion) 
-[![build-status](https://pipelines-badges-service.useast.staging.atlassian.io/badge/vulpine/simple-sql.svg)](https://bitbucket.org/vulpine/simple-sql/addon/pipelines/home#!/)
+[![Build Status](https://travis-ci.org/Vulpine-IO/lib-simple-sql.svg?branch=development)](https://travis-ci.org/Vulpine-IO/lib-simple-sql)
