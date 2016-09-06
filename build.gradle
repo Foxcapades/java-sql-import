@@ -1,96 +1,146 @@
-plugins {
-  id "com.jfrog.bintray" version "1.7.1"
-}
-
-def config = [
-  group:   'io.vulpine.lib',
-  groupKey: 'vulpine',
-  version: '0.1.4',
-  name:    'simple-sql',
-  repo:    'lib-simple-sql',
-  jvm:     '1.6'
-];
-
-group config.group
-version config.version
-
 apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: 'maven-publish'
+apply plugin: 'jacoco'
+apply plugin: 'signing'
+apply from: 'config.gradle'
 
-sourceCompatibility = config.jvm
-targetCompatibility = config.jvm
+group "${config.organization.slug}.${config.project.group}"
+version config.project.version
+
+sourceCompatibility = config.project.jvm
+targetCompatibility = config.project.jvm
 
 /*
- * BinTray Configuration
+ * Tasks
  */
-bintray {
-  user = System.getenv('BINTRAY_USER')
-  key = System.getenv('BINTRAY_KEY')
-  publications = ['maven']
-  pkg {
-    repo = 'maven'
-    name = config.name
-    userOrg = 'vpx'
-    licenses = ['Apache-2.0']
-    vcsUrl = "https://bitbucket.org/${config.groupKey}/${config.name}"
-    version {
-      name = config.version
-      released = new Date()
-      vcsTag = config.version
-    }
-  }
-}
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.14.1'
+  gradleVersion = '3.0'
   distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
 
-repositories {}
-dependencies {}
+task sourceJar(type: Jar, dependsOn: classes) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
 
-class Wrap{Node u;Wrap p;Wrap(n){u=n};Wrap(a,b){u=a;p=b};Wrap mApp(s,Map v){def c=u.appendNode(s);v.forEach({k,d->c.
-appendNode(k,d)});return new Wrap(c,this)};Wrap nApp(s,...l){def n=u.appendNode(s);for(def c:l)n.append(c);return new
-Wrap(n,this)};Wrap app(a, b){def n=u.appendNode(a,b);return new Wrap(n,this)};Wrap up(){return p}}
+task javadoc(overwrite: true, type: Javadoc) {
+  source = sourceSets.main.allJava
+  destinationDir = file("${project.projectDir}/docs/")
+}
 
-publishing {
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
 
-  repositories { maven { url "https://api.bintray.com/maven/vpx/maven/${config.name}/;publish=1" } }
+/*
+ * JaCoCo Configuration
+ */
+jacoco {
+  toolVersion = "0.7.6.201602180812"
+  reportsDir = file("${buildDir}/reports/jacoco")
+}
 
-  publications {
-    maven(MavenPublication) {
-      from components.java
-      pom.withXml {
-        { Node project ->
+jacocoTestReport {
+  reports {
+    xml.enabled true
+    html.enabled false
+  }
+}
 
-          def bitBucketUrl = "https://bitbucket.org/${config.groupKey}/${config.name}";
+configurations {
+  asciidoctor
+}
 
-          new Wrap(project)
-            .app('inceptionYear', '2016').up()
-            .mApp('organization', [name: 'Vulpine IO', url: 'http://vulpine.io']).up()
-            .nApp('developers')
-              .mApp('developer', [id: 'elliefops', name: 'Elizabeth Harper', email: 'elliefops@gmail.com']).up().up()
-            .mApp('issueManagement', [
-              system: 'YouTrack',
-              url:    "http://${config.groupKey}.myjetbrains.com/youtrack/issues?q=project%3A+${config.repo}"
-            ]).up()
-            .mApp('ciManagement', [ system: 'Bitbucket Pipelines', url: "${bitBucketUrl}/addon/pipelines/home#!/" ]).up()
-            .mApp('scm', [
-              connection:          "scm:git:${bitBucketUrl}.git",
-              developerConnection: "scm:git:${bitBucketUrl}.git",
-              tag:                 'master',
-              url:                 bitBucketUrl
-            ]).up()
-            .nApp('licenses')
-               .mApp('license', [
-                name        : 'Apache License, Version 2.0',
-                url         : 'http://www.apache.org/licenses/LICENSE-2.0.txt',
-                distribution: 'repo'
-              ]);
+artifacts {
+  archives jar
+  archives sourceJar
+  archives javadocJar
+}
 
-          return project;
-        }.call((Node)asNode())
+signing {
+  sign configurations.archives
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  asciidoctor(
+    [ group: 'org.asciidoctor', name: 'asciidoclet', version: '0.1.3' ]
+  )
+}
+
+javadoc {
+  source = sourceSets.main.allJava
+  options{
+    tags = [ "chainable" ]
+    doclet = 'org.asciidoctor.Asciidoclet'
+    docletpath = configurations.asciidoctor.files.asType(List)
+  }
+}
+
+uploadArchives {
+
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository( url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/' ) {
+        authentication( userName: OSSRH_USERNAME, password: OSSRH_PASSWORD )
+      }
+
+//      repository( url: 'https://oss.sonatype.org/content/repositories/snapshots/' ) {
+//        authentication( userName: config.credentials.username, password: config.credentials.password )
+//      }
+
+      pom.project {
+        name "${config.organization.slug}.${config.project.group}:${config.project.name}"
+        packaging 'jar'
+        description config.project.description
+        url config.project.site
+
+        inceptionYear '2016'
+
+        organization {
+          name config.organization.title
+          url config.organization.site
+        }
+
+        issueManagement {
+          system 'Issue Tracker'
+          url config.project.tracker
+        }
+
+        ciManagement {
+          system 'Travis CI'
+          url "https://travis-ci.org/${config.organization.key}"
+        }
+
+        scm {
+          connection "scm:git:${config.project.vcs}"
+          developerConnection "scm:git:${config.project.vcs}"
+          tag 'master'
+          url config.project.site
+        }
+
+        licenses {
+          license {
+            name config.license.name
+            url config.license.url
+            distribution 'repo'
+          }
+        }
+
+        developers {
+          developer {
+            id config.developer.user
+            name config.developer.name
+            email config.developer.email
+          }
+        }
       }
     }
   }
