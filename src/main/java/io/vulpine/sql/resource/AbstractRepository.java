@@ -40,17 +40,20 @@ public abstract class AbstractRepository
         final Statement  s = r.getStatement();
         final Connection c = s.getConnection();
 
-        if (!r.isClosed())
+        if (!r.isClosed()) {
           r.close();
+        }
 
         if (!s.isClosed()) {
-          if (s instanceof PreparedStatement)
+          if (s instanceof PreparedStatement) {
             ((PreparedStatement) s).clearParameters();
+          }
           s.close();
         }
 
-        if (!c.isClosed())
+        if (!c.isClosed()) {
           c.close();
+        }
 
       } else if (a instanceof PreparedStatement) {
 
@@ -62,19 +65,22 @@ public abstract class AbstractRepository
           p.close();
         }
 
-        if (!c.isClosed())
+        if (!c.isClosed()) {
           c.close();
+        }
 
       } else if (a instanceof Statement) {
 
         final Statement  s = (Statement) a;
         final Connection c = s.getConnection();
 
-        if (!s.isClosed())
+        if (!s.isClosed()) {
           s.close();
+        }
 
-        if (!c.isClosed())
+        if (!c.isClosed()) {
           c.close();
+        }
 
       }
     }
