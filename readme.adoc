@@ -1,0 +1,7 @@
+= simple-sql
+
+image:https://img.shields.io/maven-central/v/io.vulpine.lib/sql-import.svg?maxAge=2592000[link=http://search.maven.org/#artifactdetails|io.vulpine.lib|sql-import]
+image:https://api.codacy.com/project/badge/Grade/e65d6ddb4cba48bc8ae7cf531f10d1f4[link=https://www.codacy.com/app/elliefops/lib-sql?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=foxcapades/java-sql-import&amp;utm_campaign=Badge_Grade]
+image:https://travis-ci.org/foxcapades/java-sql-import.svg?branch=master[Build Status, link=https://travis-ci.org/Vulpine-IO/lib-simple-sql]
+image:https://img.shields.io/github/license/foxcapades/java-sql-import.svg?maxAge=2592000?style=plastic[License]
+image:https://img.shields.io/badge/Java-18.3-red.svg[Java Version, title="Java Version"]
