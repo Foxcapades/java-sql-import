@@ -1,7 +1,57 @@
-= simple-sql
+= sql-import
+:jdk-path: https://docs.oracle.com/javase/10/docs/api
 
-image:https://img.shields.io/maven-central/v/io.vulpine.lib/sql-import.svg?maxAge=2592000[link=http://search.maven.org/#artifactdetails|io.vulpine.lib|sql-import]
+image:https://img.shields.io/maven-central/v/io.vulpine.lib/sql-import.svg?maxAge=14400[link=http://search.maven.org/#artifactdetails|io.vulpine.lib|sql-import]
 image:https://api.codacy.com/project/badge/Grade/e65d6ddb4cba48bc8ae7cf531f10d1f4[link=https://www.codacy.com/app/elliefops/lib-sql?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=foxcapades/java-sql-import&amp;utm_campaign=Badge_Grade]
 image:https://travis-ci.org/foxcapades/java-sql-import.svg?branch=master[Build Status, link=https://travis-ci.org/Vulpine-IO/lib-simple-sql]
 image:https://img.shields.io/github/license/foxcapades/java-sql-import.svg?maxAge=2592000?style=plastic[License]
-image:https://img.shields.io/badge/Java-18.3-red.svg[Java Version, title="Java Version"]
+image:https://img.shields.io/badge/Java-18.3-red.svg[Java Version, title="Java Version", link={jdk-path}]
+
+SQL resource loading & caching.
+
+Reads from a configurable standardized directory layout organized by query type.
+
+Queries are cached per SqlLoader instance so repeated loads of the same query
+will only incur the filesystem I/O cost once.
+
+Import functions utilize the
+{jdk-path}/java/util/Optional.html[`java.util.Optional`] type.  In the event
+that a query does not exist or cannot be loaded, an empty `Optional` will be
+returned, otherwise the `Optional` will contain the SQL text loaded from the
+specified file.
+
+== Examples
+
+.Resource directory using default settings
+[source]
+----
+/resource-dir (src/main/resources for Gradle projects)
+  └─ /sql
+      ├─ /delete
+      │   ├─ /comments
+      │   │   ├─ by-id.sql
+      │   │   └─ by-user.sql
+      │   └─ /users
+      │       └─ by-id.sql
+      ├─ /insert
+      │   ├─ /comment.sql
+      │   └─ /user.sql
+      ├─ /select
+      (etc...)
+----
+
+Using the example above loading queries could be accomplished by the following:
+
+.Example.java
+[source, java]
+----
+public void example() {
+  var loader      = new SqlLoader(); // <1>
+  var delComments = loader.delete("comments.by-user"); // <2>
+  var delUsers    = loader.delete("users/by-id"); // <3>
+  var insUser     = loader.insert("user");
+}
+----
+<1> Defaulted SqlLoader instance
+<2> Import using dot notation
+<3> Import using path notation
