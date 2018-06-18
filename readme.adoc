@@ -3,7 +3,6 @@
 
 image:https://img.shields.io/maven-central/v/io.vulpine.lib/sql-import.svg?maxAge=14400[link=http://search.maven.org/#artifactdetails|io.vulpine.lib|sql-import]
 image:https://api.codacy.com/project/badge/Grade/5feaaf04c0024aa78b194921723b25ad["Codacy code quality", link="https://www.codacy.com/app/Foxcapades/java-sql-import?utm_source=github.com&utm_medium=referral&utm_content=Foxcapades/java-sql-import&utm_campaign=Badge_Grade"]
-image:https://travis-ci.org/foxcapades/java-sql-import.svg?branch=master[Build Status, link=https://travis-ci.org/Vulpine-IO/lib-simple-sql]
 image:https://img.shields.io/github/license/foxcapades/java-sql-import.svg?maxAge=2592000?style=plastic[License]
 image:https://img.shields.io/badge/Java-18.3-red.svg[Java Version, title="Java Version", link={jdk-path}]
 
